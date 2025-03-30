@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Cars Racing in Mountains</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #87CEEB, #6495ED);
+        }
+
+        .container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Mountains Background */
+        .mountains {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(to bottom, transparent 0%, #8B4513 100%);
+            z-index: 1;
+        }
+
+        .mountain {
+            position: absolute;
+            bottom: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            z-index: 1;
+        }
+
+        .mountain-1 {
+            left: 10%;
+            border-bottom: 300px solid #6B8E23;
+        }
+
+        .mountain-2 {
+            left: 30%;
+            border-bottom: 400px solid #556B2F;
+        }
+
+        .mountain-3 {
+            left: 50%;
+            border-bottom: 350px solid #6B8E23;
+        }
+
+        .mountain-4 {
+            left: 70%;
+            border-bottom: 450px solid #556B2F;
+        }
+
+        .mountain-5 {
+            left: 90%;
+            border-bottom: 300px solid #6B8E23;
+        }
+
+        /* Road */
+        .road {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 150px;
+            background-color: #333;
+            z-index: 2;
+            perspective: 500px;
+            transform: rotateX(60deg);
+            transform-origin: bottom;
+        }
+
+        .road-line {
+            position: absolute;
+            top: 50%;
+            width: 10%;
+            height: 10px;
+            background-color: #FFF;
+            transform: translateY(-50%);
+            z-index: 3;
+            animation: roadLineAnimation 2s linear infinite;
+        }
+
+        @keyframes roadLineAnimation {
+            0% {
+                transform: translateY(-50%) translateX(-100vw);
+            }
+            100% {
+                transform: translateY(-50%) translateX(100vw);
+            }
+        }
+
+        /* Cars */
+        .car {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            background-color: #FF0000;
+            border-radius: 15px;
+            z-index: 4;
+            transition: transform 0.3s ease;
+        }
+
+        .car:before {
+            content: "";
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            width: 80px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+        }
+
+        .car:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 10px;
+            width: 20px;
+            height: 10px;
+            background-color: #000;
+            border-radius: 50%;
+            box-shadow: 
+                30px 0 0 0 #000,
+                60px 0 0 0 #000,
+                80px 0 0 0 #000;
+        }
+
+        .car1 {
+            bottom: 30px;
+            left: 20%;
+            background-color: #FF0000;
+            animation: carRace 10s linear infinite;
+            animation-delay: 0s;
+        }
+
+        .car2 {
+            bottom: 30px;
+            left: 20%;
+            background-color: #FFFF00;
+            animation: carRace 10s linear infinite;
+            animation-delay: 1s;
+        }
+
+        .car3 {
+            bottom: 30px;
+            left: 20%;
+            background-color: #0000FF;
+            animation: carRace 10s linear infinite;
+            animation-delay: 3s;
+        }
+
+        @keyframes carRace {
+            0% {
+                left: 0%;
+                transform: translateX(-100%) rotateY(0deg);
+            }
+            20% {
+                left: 20%;
+                transform: translateX(0) rotateY(0deg);
+            }
+            30% {
+                left: 30%;
+                transform: translateX(0) rotateY(-5deg);
+            }
+            40% {
+                left: 40%;
+                transform: translateX(0) rotateY(5deg);
+            }
+            50% {
+                left: 50%;
+                transform: translateX(0) rotateY(-5deg);
+            }
+            60% {
+                left: 60%;
+                transform: translateX(0) rotateY(5deg);
+            }
+            70% {
+                left: 70%;
+                transform: translateX(0) rotateY(-5deg);
+            }
+            80% {
+                left: 80%;
+                transform: translateX(0) rotateY(0deg);
+            }
+            100% {
+                left: 110%;
+                transform: translateX(0) rotateY(0deg);
+            }
+        }
+
+        /* Trees */
+        .tree {
+            position: absolute;
+            bottom: 150px;
+            width: 40px;
+            z-index: 2;
+        }
+
+        .tree-trunk {
+            width: 10px;
+            height: 30px;
+            background-color: #8B4513;
+            margin: 0 auto;
+        }
+
+        .tree-top {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 50px solid #006400;
+            margin: -20px auto 0;
+        }
+
+        /* Clouds */
+        .cloud {
+            position: absolute;
+            background: #FFF;
+            border-radius: 50px;
+            opacity: 0.8;
+            z-index: 0;
+            animation: cloudMove linear infinite;
+        }
+
+        @keyframes cloudMove {
+            0% {
+                transform: translateX(-200px);
+            }
+            100% {
+                transform: translateX(calc(100vw + 200px));
+            }
+        }
+
+        /* Sun */
+        .sun {
+            position: absolute;
+            top: 50px;
+            right: 100px;
+            width: 80px;
+            height: 80px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 50px #FFD700;
+            z-index: 0;
+            animation: sunPulse 5s ease-in-out infinite;
+        }
+
+        @keyframes sunPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 50px #FFD700;
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 70px #FFD700;
+            }
+        }
+
+        /* Dust */
+        .dust {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: rgba(150, 75, 0, 0.6);
+            border-radius: 50%;
+            z-index: 3;
+            animation: dustAnimation 1s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes dustAnimation {
+            0% {
+                opacity: 0.8;
+                transform: translate(0, 0);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(20px, -20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sun -->
+        <div class="sun"></div>
+
+        <!-- Mountains -->
+        <div class="mountains">
+            <div class="mountain mountain-1"></div>
+            <div class="mountain mountain-2"></div>
+            <div class="mountain mountain-3"></div>
+            <div class="mountain mountain-4"></div>
+            <div class="mountain mountain-5"></div>
+        </div>
+
+        <!-- Road -->
+        <div class="road">
+            <div class="road-line" style="animation-delay: 0s;"></div>
+            <div class="road-line" style="animation-delay: 0.5s;"></div>
+            <div class="road-line" style="animation-delay: 1s;"></div>
+            <div class="road-line" style="animation-delay: 1.5s;"></div>
+        </div>
+
+        <!-- Cars -->
+        <div class="car car1"></div>
+        <div class="car car2"></div>
+        <div class="car car3"></div>
+
+        <!-- Trees -->
+        <div id="trees-container"></div>
+
+        <!-- Clouds -->
+        <div id="clouds-container"></div>
+
+        <!-- Dust particles -->
+        <div id="dust-container"></div>
+    </div>
+
+    <script>
+        // Create Trees
+        const treesContainer = document.getElementById('trees-container');
+        for (let i = 0; i < 15; i++) {
+            const tree = document.createElement('div');
+            tree.className = 'tree';
+            tree.style.left = `${Math.random() * 100}%`;
+            
+            const trunk = document.createElement('div');
+            trunk.className = 'tree-trunk';
+            
+            const top = document.createElement('div');
+            top.className = 'tree-top';
+            
+            tree.appendChild(top);
+            tree.appendChild(trunk);
+            treesContainer.appendChild(tree);
+        }
+
+        // Create Clouds
+        const cloudsContainer = document.getElementById('clouds-container');
+        for (let i = 0; i < 8; i++) {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            
+            const size = 50 + Math.random() * 100;
+            cloud.style.width = `${size}px`;
+            cloud.style.height = `${size / 2}px`;
+            
+            cloud.style.top = `${Math.random() * 30}%`;
+            cloud.style.left = `${Math.random() * 100}%`;
+            
+            const duration = 60 + Math.random() * 60;
+            cloud.style.animationDuration = `${duration}s`;
+            cloud.style.animationDelay = `${Math.random() * -duration}s`;
+            
+            cloudsContainer.appendChild(cloud);
+        }
+
+        // Create and animate dust particles
+        const dustContainer = document.getElementById('dust-container');
+        const cars = document.querySelectorAll('.car');
+
+        function createDustParticle(car) {
+            const rect = car.getBoundingClientRect();
+            
+            const dust = document.createElement('div');
+            dust.className = 'dust';
+            dust.style.left = `${rect.x}px`;
+            dust.style.bottom = `${window.innerHeight - rect.y - rect.height}px`;
+            
+            dustContainer.appendChild(dust);
+            
+            // Remove dust particle after animation
+            setTimeout(() => {
+                dust.remove();
+            }, 1000);
+        }
+
+        // Generate dust particles behind cars
+        setInterval(() => {
+            cars.forEach(car => {
+                const rect = car.getBoundingClientRect();
+                // Only create dust if car is visible
+                if (rect.left > 0 && rect.right < window.innerWidth) {
+                    createDustParticle(car);
+                }
+            });
+        }, 100);
+
+        // Make cars move slightly up and down to simulate bumps
+        setInterval(() => {
+            cars.forEach(car => {
+                const currentBottom = parseInt(getComputedStyle(car).bottom);
+                const newBottom = 30 + Math.random() * 5;
+                car.style.bottom = `${newBottom}px`;
+            });
+        }, 200);
+    </script>
+</body>
+</html>
