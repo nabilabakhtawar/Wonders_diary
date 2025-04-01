@@ -19,7 +19,6 @@
             overflow: hidden;
         }
 
-        /* Mountains Background */
         .mountains {
             position: absolute;
             bottom: 0;
@@ -62,7 +61,6 @@
             border-bottom: 300px solid #6B8E23;
         }
 
-        /* Road */
         .road {
             position: absolute;
             bottom: 0;
@@ -95,7 +93,6 @@
             }
         }
 
-        /* Cars */
         .car {
             position: absolute;
             width: 120px;
@@ -195,7 +192,6 @@
             }
         }
 
-        /* Trees */
         .tree {
             position: absolute;
             bottom: 150px;
@@ -219,7 +215,6 @@
             margin: -20px auto 0;
         }
 
-        /* Clouds */
         .cloud {
             position: absolute;
             background: #FFF;
@@ -238,7 +233,6 @@
             }
         }
 
-        /* Sun */
         .sun {
             position: absolute;
             top: 50px;
@@ -263,7 +257,6 @@
             }
         }
 
-        /* Dust */
         .dust {
             position: absolute;
             width: 5px;
@@ -289,10 +282,8 @@
 </head>
 <body>
     <div class="container">
-        <!-- Sun -->
         <div class="sun"></div>
 
-        <!-- Mountains -->
         <div class="mountains">
             <div class="mountain mountain-1"></div>
             <div class="mountain mountain-2"></div>
@@ -301,7 +292,6 @@
             <div class="mountain mountain-5"></div>
         </div>
 
-        <!-- Road -->
         <div class="road">
             <div class="road-line" style="animation-delay: 0s;"></div>
             <div class="road-line" style="animation-delay: 0.5s;"></div>
@@ -309,23 +299,18 @@
             <div class="road-line" style="animation-delay: 1.5s;"></div>
         </div>
 
-        <!-- Cars -->
         <div class="car car1"></div>
         <div class="car car2"></div>
         <div class="car car3"></div>
 
-        <!-- Trees -->
         <div id="trees-container"></div>
 
-        <!-- Clouds -->
         <div id="clouds-container"></div>
 
-        <!-- Dust particles -->
         <div id="dust-container"></div>
     </div>
 
     <script>
-        // Create Trees
         const treesContainer = document.getElementById('trees-container');
         for (let i = 0; i < 15; i++) {
             const tree = document.createElement('div');
@@ -343,7 +328,6 @@
             treesContainer.appendChild(tree);
         }
 
-        // Create Clouds
         const cloudsContainer = document.getElementById('clouds-container');
         for (let i = 0; i < 8; i++) {
             const cloud = document.createElement('div');
@@ -363,7 +347,6 @@
             cloudsContainer.appendChild(cloud);
         }
 
-        // Create and animate dust particles
         const dustContainer = document.getElementById('dust-container');
         const cars = document.querySelectorAll('.car');
 
@@ -377,24 +360,20 @@
             
             dustContainer.appendChild(dust);
             
-            // Remove dust particle after animation
             setTimeout(() => {
                 dust.remove();
             }, 1000);
         }
 
-        // Generate dust particles behind cars
         setInterval(() => {
             cars.forEach(car => {
                 const rect = car.getBoundingClientRect();
-                // Only create dust if car is visible
                 if (rect.left > 0 && rect.right < window.innerWidth) {
                     createDustParticle(car);
                 }
             });
         }, 100);
 
-        // Make cars move slightly up and down to simulate bumps
         setInterval(() => {
             cars.forEach(car => {
                 const currentBottom = parseInt(getComputedStyle(car).bottom);
