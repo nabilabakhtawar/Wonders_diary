@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enchanted Forest</title>
+    <style>
+        :root {
+            --time-of-day: 0;
+            --sky-color: rgb(135, 206, 235);
+            --ground-color: #3a5f0b;
+            --tree-color: #2d4a06;
+            --moon-visibility: 0;
+            --sun-position: 50%;
+            --moon-position: 150%;
+            --firefly-color: rgba(255, 255, 150, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            font-family: Arial, sans-serif;
+        }
+
+        .scene {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--sky-color);
+            transition: background 3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .day-night-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .day-night-toggle:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 30%;
+            background: var(--ground-color);
+            transition: background 3s ease-in-out;
+        }
+
+        .sun {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: #ffdd00;
+            border-radius: 50%;
+            top: var(--sun-position);
+            left: 15%;
+            box-shadow: 0 0 40px rgba(255, 221, 0, 0.7);
+            transition: top 3s ease-in-out, opacity 3s ease-in-out, box-shadow 3s ease-in-out;
+        }
+
+        .moon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: #f5f5f5;
+            border-radius: 50%;
+            top: var(--moon-position);
+            left: 85%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            opacity: var(--moon-visibility);
+            transition: top 3s ease-in-out, opacity 3s ease-in-out;
+        }
+
+        .moon::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 15px;
+            height: 15px;
+            background: rgba(200, 200, 200, 0.8);
+            border-radius: 50%;
+        }
+
+        .moon::after {
+            content: '';
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 10px;
+            height: 10px;
+            background: rgba(200, 200, 200, 0.6);
+            border-radius: 50%;
+        }
+
+        .tree {
+            position: absolute;
+            bottom: 30%;
+            width: 30px;
+            height: 100px;
+            background: #5d3a1a;
+            transform-origin: bottom center;
+            z-index: 5;
+            transition: all 0.3s ease;
+        }
+
+        .tree::before {
+            content: '';
+            position: absolute;
+            bottom: 60px;
+            left: -70px;
+            width: 0;
+            height: 0;
+            border-left: 85px solid transparent;
+            border-right: 85px solid transparent;
+            border-bottom: 160px solid var(--tree-color);
+            z-index: 4;
+            transition: border-color 3s ease-in-out;
+        }
+
+        .tree:nth-child(1) {
+            left: 15%;
+            height: 150px;
+            width: 20px;
+        }
+
+        .tree:nth-child(2) {
+            left: 45%;
+            height: 180px;
+            width: 25px;
+        }
+
+        .tree:nth-child(3) {
+            left: 75%;
+            height: 200px;
+            width: 30px;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: twinkle 4s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        .clouds {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            filter: blur(5px);
+            opacity: 0.7;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .firefly {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: var(--firefly-color);
+            border-radius: 50%;
+            filter: blur(1px);
+            z-index: 10;
+            opacity: 0;
+            box-shadow: 0 0 10px var(--firefly-color), 0 0 20px var(--firefly-color);
+            transition: opacity 3s ease-in-out;
+        }
+
+        .bird {
+            position: absolute;
+            width: 10px;
+            height: 5px;
+            background: transparent;
+            top: 100px;
+            left: -100px;
+            z-index: 10;
+        }
+
+        .bird::before, .bird::after {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 6px;
+            background: transparent;
+            border-top: 2px solid black;
+            border-radius: 50% 50% 0 0;
+        }
+
+        .bird::before {
+            left: -10px;
+            transform: rotate(-10deg);
+        }
+
+        .bird::after {
+            left: 5px;
+            transform: rotate(10deg);
+        }
+
+        .particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            max-width: 250px;
+            opacity: 0.8;
+            transition: opacity 0.5s ease;
+        }
+
+        .instructions:hover {
+            opacity: 1;
+        }
+
+        .music-control {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .instructions {
+                font-size: 12px;
+                max-width: 200px;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scene">
+        <div class="instructions">
+            <h3>Enchanted Forest</h3>
+            <p>Click anywhere to create magical effects</p>
+            <p>Press Space to summon birds</p>
+            <p>Use controls below to change effects</p>
+        </div>
+        
+        <button class="day-night-toggle">Toggle Day/Night</button>
+        
+        <div class="sun"></div>
+        <div class="moon"></div>
+        
+        <div class="stars"></div>
+        <div class="clouds"></div>
+        
+        <div class="tree"></div>
+        <div class="tree"></div>
+        <div class="tree"></div>
+        
+        <div class="ground"></div>
+        
+        <div class="particles-container"></div>
+        
+        <div class="controls">
+            <button class="control-btn" id="wind-btn">Wind Effect</button>
+            <button class="control-btn" id="magic-btn">Magic Dust</button>
+        </div>
+        
+        <div class="music-control">
+            <button class="control-btn" id="sound-btn">Sound On/Off</button>
+        </div>
+        
+        <audio id="day-ambience" loop>
+            <source src="/api/placeholder/400/320" type="audio/mp3">
+        </audio>
+        
+        <audio id="night-ambience" loop>
+            <source src="/api/placeholder/400/320" type="audio/mp3">
+        </audio>
+        
+        <audio id="magic-sound">
+            <source src="/api/placeholder/400/320" type="audio/mp3">
+        </audio>
+        
+        <audio id="bird-sound">
+            <source src="/api/placeholder/400/320" type="audio/mp3">
+        </audio>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scene elements
+            const scene = document.querySelector('.scene');
+            const ground = document.querySelector('.ground');
+            const sun = document.querySelector('.sun');
+            const moon = document.querySelector('.moon');
+            const stars = document.querySelector('.stars');
+            const trees = document.querySelectorAll('.tree');
+            const dayNightToggle = document.querySelector('.day-night-toggle');
+            const dayAmbience = document.getElementById('day-ambience');
+            const nightAmbience = document.getElementById('night-ambience');
+            const magicSound = document.getElementById('magic-sound');
+            const birdSound = document.getElementById('bird-sound');
+            const soundBtn = document.getElementById('sound-btn');
+            const windBtn = document.getElementById('wind-btn');
+            const magicBtn = document.getElementById('magic-btn');
+            const particlesContainer = document.querySelector('.particles-container');
+            
+            // State
+            let isNight = false;
+            let isSoundOn = false;
+            let isWindy = false;
+            const particles = [];
+            const fireflies = [];
+            const birds = [];
+            
+            // Initialize the scene
+            initStars();
+            initClouds();
+            initFireflies();
+            
+            // Trees subtle animation
+            trees.forEach(tree => {
+                tree.style.animation = `sway ${5 + Math.random() * 5}s infinite ease-in-out`;
+            });
+            
+            // Generate stars
+            function initStars() {
+                for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    star.style.width = `${Math.random() * 3 + 1}px`;
+                    star.style.height = star.style.width;
+                    star.style.top = `${Math.random() * 70}%`;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.animationDelay = `${Math.random() * 4}s`;
+                    stars.appendChild(star);
+                }
+            }
+            
+            // Generate clouds
+            function initClouds() {
+                const clouds = document.querySelector('.clouds');
+                for (let i = 0; i < 15; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.classList.add('cloud');
+                    cloud.style.width = `${Math.random() * 200 + 100}px`;
+                    cloud.style.height = `${Math.random() * 60 + 40}px`;
+                    cloud.style.top = `${Math.random() * 30}%`;
+                    cloud.style.left = `${Math.random() * 100}%`;
+                    
+                    // Set animation for clouds
+                    const speed = Math.random() * 100 + 50;
+                    cloud.style.animation = `cloud-move ${speed}s linear infinite`;
+                    
+                    clouds.appendChild(cloud);
+                }
+                
+                // Define cloud movement keyframes
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    @keyframes cloud-move {
+                        0% { transform: translateX(-200px); }
+                        100% { transform: translateX(${window.innerWidth + 200}px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Generate fireflies
+            function initFireflies() {
+                for (let i = 0; i < 30; i++) {
+                    createFirefly();
+                }
+            }
+            
+            function createFirefly() {
+                const firefly = document.createElement('div');
+                firefly.classList.add('firefly');
+                
+                const x = Math.random() * window.innerWidth;
+                const y = Math.random() * (window.innerHeight * 0.6) + (window.innerHeight * 0.3);
+                
+                firefly.style.left = `${x}px`;
+                firefly.style.top = `${y}px`;
+                
+                const duration = Math.random() * 10 + 10;
+                firefly.style.animation = `float ${duration}s infinite ease-in-out`;
+                
+                scene.appendChild(firefly);
+                fireflies.push({
+                    element: firefly,
+                    x: x,
+                    y: y,
+                    speedX: Math.random() * 2 - 1,
+                    speedY: Math.random() * 2 - 1,
+                    flicker: setInterval(() => {
+                        firefly.style.opacity = Math.random() * 0.5 + 0.2;
+                    }, 200)
+                });
+            }
+            
+            // Create a bird
+            function createBird() {
+                const bird = document.createElement('div');
+                bird.classList.add('bird');
+                
+                const y = Math.random() * (window.innerHeight * 0.4) + 50;
+                
+                bird.style.top = `${y}px`;
+                bird.style.left = '-50px';
+                
+                scene.appendChild(bird);
+                
+                // Add to birds array
+                birds.push({
+                    element: bird,
+                    x: -50,
+                    y: y,
+                    speed: Math.random() * 3 + 2
+                });
+                
+                if (isSoundOn) {
+                    birdSound.currentTime = 0;
+                    birdSound.play();
+                }
+            }
+            
+            // Create particles
+            function createParticles(x, y, count, type = 'default') {
+                for (let i = 0; i < count; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Different particle styles based on type
+                    if (type === 'magic') {
+                        const hue = Math.random() * 60 + 200; // Blue to purple
+                        particle.style.backgroundColor = `hsl(${hue}, 100%, 70%)`;
+                        particle.style.width = `${Math.random() * 6 + 2}px`;
+                        particle.style.height = particle.style.width;
+                        particle.style.boxShadow = `0 0 ${Math.random() * 10 + 5}px hsl(${hue}, 100%, 70%)`;
+                    } else {
+                        particle.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                        particle.style.width = `${Math.random() * 4 + 1}px`;
+                        particle.style.height = particle.style.width;
+                    }
+                    
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    
+                    particlesContainer.appendChild(particle);
+                    
+                    // Add to particles array with physics properties
+                    particles.push({
+                        element: particle,
+                        x: x,
+                        y: y,
+                        speedX: Math.random() * 10 - 5,
+                        speedY: Math.random() * -10 - 5,
+                        gravity: 0.2,
+                        life: 100 + Math.random() * 50,
+                        type: type
+                    });
+                }
+                
+                if (type === 'magic' && isSoundOn) {
+                    magicSound.currentTime = 0;
+                    magicSound.play();
+                }
+            }
+            
+            // Toggle day/night cycle
+            function toggleDayNight() {
+                isNight = !isNight;
+                
+                if (isNight) {
+                    document.documentElement.style.setProperty('--sky-color', '#0c1445');
+                    document.documentElement.style.setProperty('--ground-color', '#0a3410');
+                    document.documentElement.style.setProperty('--tree-color', '#0f2504');
+                    document.documentElement.style.setProperty('--sun-position', '150%');
+                    document.documentElement.style.setProperty('--moon-position', '20%');
+                    document.documentElement.style.setProperty('--moon-visibility', '1');
+                    
+                    stars.style.opacity = 1;
+                    
+                    // Activate fireflies
+                    fireflies.forEach(firefly => {
+                        firefly.element.style.opacity = '1';
+                    });
+                    
+                    // Transition audio
+                    if (isSoundOn) {
+                        fadeAudio(dayAmbience, 'out');
+                        fadeAudio(nightAmbience, 'in');
+                    }
+                } else {
+                    document.documentElement.style.setProperty('--sky-color', 'rgb(135, 206, 235)');
+                    document.documentElement.style.setProperty('--ground-color', '#3a5f0b');
+                    document.documentElement.style.setProperty('--tree-color', '#2d4a06');
+                    document.documentElement.style.setProperty('--sun-position', '20%');
+                    document.documentElement.style.setProperty('--moon-position', '150%');
+                    document.documentElement.style.setProperty('--moon-visibility', '0');
+                    
+                    stars.style.opacity = 0;
+                    
+                    // Deactivate fireflies
+                    fireflies.forEach(firefly => {
+                        firefly.element.style.opacity = '0';
+                    });
+                    
+                    // Transition audio
+                    if (isSoundOn) {
+                        fadeAudio(nightAmbience, 'out');
+                        fadeAudio(dayAmbience, 'in');
+                    }
+                }
+            }
+            
+            // Helper function to fade audio
+            function fadeAudio(audioElement, direction) {
+                let volume = direction === 'in' ? 0 : 1;
+                const interval = 0.05;
+                const step = direction === 'in' ? 0.05 : -0.05;
+                
+                audioElement.volume = volume;
+                
+                if (direction === 'in') {
+                    audioElement.play();
+                }
+                
+                const fadeInterval = setInterval(() => {
+                    volume += step;
+                    
+                    if (volume <= 0 || volume >= 1) {
+                        clearInterval(fadeInterval);
+                        if (direction === 'out') {
+                            audioElement.pause();
+                        }
+                        volume = direction === 'in' ? 1 : 0;
+                    }
+                    
+                    audioElement.volume = volume;
+                }, 100);
+            }
+            
+            // Toggle wind effect
+            function toggleWind() {
+                isWindy = !isWindy;
+                
+                if (isWindy) {
+                    trees.forEach(tree => {
+                        tree.style.animation = 'sway 2s infinite ease-in-out';
+                        tree.style.animationDirection = 'alternate';
+                    });
+                    windBtn.style.background = 'rgba(100, 200, 255, 0.5)';
+                } else {
+                    trees.forEach(tree => {
+                        tree.style.animation = `sway ${5 + Math.random() * 5}s infinite ease-in-out`;
+                    });
+                    windBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+                }
+            }
+            
+            // Handle sound toggle
+            function toggleSound() {
+                isSoundOn = !isSoundOn;
+                
+                if (isSoundOn) {
+                    if (isNight) {
+                        nightAmbience.play();
+                    } else {
+                        dayAmbience.play();
+                    }
+                    soundBtn.style.background = 'rgba(100, 255, 100, 0.5)';
+                } else {
+                    dayAmbience.pause();
+                    nightAmbience.pause();
+                    soundBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+                }
+            }
+            
+            // Animation loop
+            function animate() {
+                // Update fireflies
+                fireflies.forEach(firefly => {
+                    if (isNight) {
+                        firefly.x += firefly.speedX;
+                        firefly.y += firefly.speedY;
+                        
+                        // Bounds checking
+                        if (firefly.x < 0 || firefly.x > window.innerWidth) {
+                            firefly.speedX *= -1;
+                        }
+                        
+                        if (firefly.y < window.innerHeight * 0.3 || firefly.y > window.innerHeight * 0.9) {
+                            firefly.speedY *= -1;
+                        }
+                        
+                        firefly.element.style.left = `${firefly.x}px`;
+                        firefly.element.style.top = `${firefly.y}px`;
+                    }
+                });
+                
+                // Update particles
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const particle = particles[i];
+                    
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+                    particle.speedY += particle.gravity;
+                    particle.life -= 1;
+                    
+                    if (particle.life <= 0) {
+                        particle.element.remove();
+                        particles.splice(i, 1);
+                        continue;
+                    }
+                    
+                    particle.element.style.left = `${particle.x}px`;
+                    particle.element.style.top = `${particle.y}px`;
+                    
+                    // Fade out based on life
+                    const opacity = particle.life / 150;
+                    particle.element.style.opacity = opacity;
+                    
+                    // Special effects for magic particles
+                    if (particle.type === 'magic') {
+                        const scale = opacity * (Math.random() * 0.5 + 0.5);
+                        particle.element.style.transform = `scale(${scale})`;
+                    }
+                }
+                
+                // Update birds
+                for (let i = birds.length - 1; i >= 0; i--) {
+                    const bird = birds[i];
+                    
+                    bird.x += bird.speed;
+                    bird.element.style.left = `${bird.x}px`;
+                    
+                    // Remove birds that have flown offscreen
+                    if (bird.x > window.innerWidth + 50) {
+                        bird.element.remove();
+                        birds.splice(i, 1);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Event listeners
+            dayNightToggle.addEventListener('click', toggleDayNight);
+            
+            scene.addEventListener('click', function(e) {
+                if (e.target.classList.contains('control-btn') || 
+                    e.target.classList.contains('day-night-toggle')) {
+                    return;
+                }
+                
+                createParticles(e.clientX, e.clientY, 20, 'magic');
+            });
+            
+            soundBtn.addEventListener('click', toggleSound);
+            windBtn.addEventListener('click', toggleWind);
+            
+            magicBtn.addEventListener('click', function() {
+                // Create magic dust particles at random positions
+                for (let i = 0; i < 5; i++) {
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight * 0.7;
+                    createParticles(x, y, 10, 'magic');
+                }
+            });
+            
+            // Keyboard events
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    createBird();
+                }
+            });
+            
+            // Window resize handler
+            window.addEventListener('resize', function() {
+                // Adjust cloud animations
+                const clouds = document.querySelectorAll('.cloud');
+                clouds.forEach(cloud => {
+                    const speed = Math.random() * 100 + 50;
+                    cloud.style.animation = `cloud-move ${speed}s linear infinite`;
+                });
+            });
+            
+            // Start animation loop
+            animate();
+        });
+    </script>
+</body>
+</html>
