@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            padding: 20px;
+        }
+        
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .quote-container {
+            perspective: 1000px;
+            height: 250px;
+            margin-bottom: 25px;
+        }
+        
+        .quote-card {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .flip {
+            transform: rotateY(180deg);
+        }
+        
+        .quote-front, .quote-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        
+        .quote-back {
+            transform: rotateY(180deg);
+        }
+        
+        .quote-text {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .quote-author {
+            font-style: italic;
+            color: #666;
+            align-self: flex-end;
+            font-size: 1rem;
+        }
+        
+        button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+        
+        button:hover {
+            background-color: #5b52e5;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(108, 99, 255, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daily Inspiration</h1>
+        <div class="quote-container">
+            <div class="quote-card">
+                <div class="quote-front">
+                    <p class="quote-text" id="front-quote-text"></p>
+                    <p class="quote-author" id="front-quote-author"></p>
+                </div>
+                <div class="quote-back">
+                    <p class="quote-text" id="back-quote-text"></p>
+                    <p class="quote-author" id="back-quote-author"></p>
+                </div>
+            </div>
+        </div>
+        <button id="new-quote-btn">New Quote</button>
+    </div>
+
+    <script>
+        // Collection of inspirational quotes
+        const quotes = [
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Life is what happens when you're busy making other plans.", author: "John Lennon" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+            { text: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+            { text: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+            { text: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
+            { text: "Success is not final, failure is not fatal: It is the courage to continue that counts.", author: "Winston Churchill" },
+            { text: "Happiness is not something ready-made. It comes from your own actions.", author: "Dalai Lama" }
+        ];
+
+        // DOM elements
+        const quoteCard = document.querySelector('.quote-card');
+        const frontQuoteText = document.getElementById('front-quote-text');
+        const frontQuoteAuthor = document.getElementById('front-quote-author');
+        const backQuoteText = document.getElementById('back-quote-text');
+        const backQuoteAuthor = document.getElementById('back-quote-author');
+        const newQuoteBtn = document.getElementById('new-quote-btn');
+
+        // Track which side is currently showing
+        let isFrontShowing = true;
+
+        // Get a random quote that's different from the current one
+        function getRandomQuote(currentText) {
+            let newQuote;
+            do {
+                newQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            } while (newQuote.text === currentText && quotes.length > 1);
+            return newQuote;
+        }
+
+        // Initial quote
+        function setInitialQuote() {
+            const initialQuote = getRandomQuote("");
+            frontQuoteText.textContent = initialQuote.text;
+            frontQuoteAuthor.textContent = "— " + initialQuote.author;
+        }
+
+        // Handle new quote request
+        function handleNewQuote() {
+            // Get the current quote text
+            const currentText = isFrontShowing ? frontQuoteText.textContent : backQuoteText.textContent;
+            
+            // Get a new quote
+            const newQuote = getRandomQuote(currentText);
+            
+            // Update the hidden side
+            if (isFrontShowing) {
+                backQuoteText.textContent = newQuote.text;
+                backQuoteAuthor.textContent = "— " + newQuote.author;
+            } else {
+                frontQuoteText.textContent = newQuote.text;
+                frontQuoteAuthor.textContent = "— " + newQuote.author;
+            }
+            
+            // Flip the card
+            quoteCard.classList.toggle('flip');
+            
+            // Update tracking variable
+            isFrontShowing = !isFrontShowing;
+        }
+
+        // Event listener
+        newQuoteBtn.addEventListener('click', handleNewQuote);
+
+        // Set initial quote when page loads
+        setInitialQuote();
+    </script>
+</body>
+</html>
