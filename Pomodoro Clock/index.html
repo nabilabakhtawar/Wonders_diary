@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        :root {
+            --primary-color: #ff6347;
+            --break-color: #4caf50;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --circle-size: 300px;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .timer-container {
+            position: relative;
+            width: var(--circle-size);
+            height: var(--circle-size);
+            margin: 0 auto 30px;
+        }
+
+        .progress-circle {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 10;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease-in-out, stroke 0.5s ease-in-out;
+        }
+
+        .progress-background {
+            stroke: #ddd;
+        }
+
+        .progress-bar {
+            stroke: var(--primary-color);
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            font-weight: bold;
+        }
+
+        .status {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .settings {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .setting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .setting label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .setting input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pomodoro Timer</h1>
+        
+        <div class="timer-container">
+            <svg class="progress-circle" viewBox="0 0 100 100">
+                <circle class="progress-background" cx="50" cy="50" r="45"></circle>
+                <circle class="progress-bar" cx="50" cy="50" r="45" stroke-dasharray="283" stroke-dashoffset="283"></circle>
+            </svg>
+            <div class="timer-display">25:00</div>
+        </div>
+        
+        <div class="status">Ready to start</div>
+        
+        <div class="controls">
+            <button id="start">Start</button>
+            <button id="pause" class="hidden">Pause</button>
+            <button id="resume" class="hidden">Resume</button>
+            <button id="reset">Reset</button>
+            <button id="skip">Skip</button>
+        </div>
+        
+        <div class="settings">
+            <div class="setting">
+                <label for="work-time">Work (min)</label>
+                <input type="number" id="work-time" min="1" value="25">
+            </div>
+            <div class="setting">
+                <label for="break-time">Break (min)</label>
+                <input type="number" id="break-time" min="1" value="5">
+            </div>
+            <div class="setting">
+                <label for="long-break-time">Long Break (min)</label>
+                <input type="number" id="long-break-time" min="1" value="15">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startBtn = document.getElementById('start');
+        const pauseBtn = document.getElementById('pause');
+        const resumeBtn = document.getElementById('resume');
+        const resetBtn = document.getElementById('reset');
+        const skipBtn = document.getElementById('skip');
+        const timerDisplay = document.querySelector('.timer-display');
+        const statusDisplay = document.querySelector('.status');
+        const progressBar = document.querySelector('.progress-bar');
+        const workTimeInput = document.getElementById('work-time');
+        const breakTimeInput = document.getElementById('break-time');
+        const longBreakTimeInput = document.getElementById('long-break-time');
+        
+        // Timer variables
+        let timer;
+        let isRunning = false;
+        let isPaused = false;
+        let timeLeft;
+        let totalTime;
+        let currentMode = 'work';
+        let pomodoroCount = 0;
+        const WORK_MODE = 'work';
+        const BREAK_MODE = 'break';
+        const LONG_BREAK_MODE = 'longBreak';
+        
+        // Calculate the circumference of the progress circle
+        const circle = document.querySelector('.progress-bar');
+        const radius = circle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        
+        // Initialize the timer
+        function initialize() {
+            const workTime = parseInt(workTimeInput.value) * 60;
+            setTimeLeft(workTime);
+            setTotalTime(workTime);
+            currentMode = WORK_MODE;
+            updateStatus('Ready to start');
+            updateTimerDisplay();
+            updateProgressBar(1); // Full circle (no progress)
+            setTimerColor(WORK_MODE);
+        }
+        
+        // Set time left
+        function setTimeLeft(seconds) {
+            timeLeft = seconds;
+        }
+        
+        // Set total time
+        function setTotalTime(seconds) {
+            totalTime = seconds;
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Update progress bar
+        function updateProgressBar(ratio) {
+            const offset = circumference - (ratio * circumference);
+            circle.style.strokeDashoffset = offset;
+        }
+        
+        // Update status display
+        function updateStatus(text) {
+            statusDisplay.textContent = text;
+        }
+        
+        // Set timer color based on mode
+        function setTimerColor(mode) {
+            if (mode === WORK_MODE) {
+                progressBar.style.stroke = 'var(--primary-color)';
+                statusDisplay.style.color = 'var(--primary-color)';
+            } else {
+                progressBar.style.stroke = 'var(--break-color)';
+                statusDisplay.style.color = 'var(--break-color)';
+            }
+        }
+        
+        // Start timer
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                isPaused = false;
+                
+                timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                        const progressRatio = 1 - (timeLeft / totalTime);
+                        updateProgressBar(progressRatio);
+                    } else {
+                        // Timer completed
+                        clearInterval(timer);
+                        completeTimer();
+                    }
+                }, 1000);
+                
+                startBtn.classList.add('hidden');
+                pauseBtn.classList.remove('hidden');
+                resumeBtn.classList.add('hidden');
+                
+                // Disable settings inputs while timer is running
+                toggleSettingsInputs(true);
+            }
+        }
+        
+        // Pause timer
+        function pauseTimer() {
+            if (isRunning && !isPaused) {
+                clearInterval(timer);
+                isPaused = true;
+                pauseBtn.classList.add('hidden');
+                resumeBtn.classList.remove('hidden');
+                updateStatus(`${currentMode === WORK_MODE ? 'Work' : 'Break'} paused`);
+            }
+        }
+        
+        // Resume timer
+        function resumeTimer() {
+            if (isRunning && isPaused) {
+                startTimer();
+                updateStatus(getStatusText());
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            isPaused = false;
+            pomodoroCount = 0;
+            
+            startBtn.classList.remove('hidden');
+            pauseBtn.classList.add('hidden');
+            resumeBtn.classList.add('hidden');
+            
+            // Re-enable settings inputs
+            toggleSettingsInputs(false);
+            
+            initialize();
+        }
+        
+        // Skip to next timer
+        function skipTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                completeTimer();
+            }
+        }
+        
+        // Complete current timer and switch modes
+        function completeTimer() {
+            // Play notification sound (browser may block without user interaction)
+            try {
+                const audio = new Audio('https://cdnjs.cloudflare.com/ajax/libs/sound-effects/1.0.2/notification.mp3');
+                audio.play();
+            } catch (e) {
+                console.log('Could not play notification sound.');
+            }
+            
+            if (currentMode === WORK_MODE) {
+                pomodoroCount++;
+                
+                // Every 4 pomodoros, take a long break
+                if (pomodoroCount % 4 === 0) {
+                    currentMode = LONG_BREAK_MODE;
+                    const longBreakTime = parseInt(longBreakTimeInput.value) * 60;
+                    setTimeLeft(longBreakTime);
+                    setTotalTime(longBreakTime);
+                    updateStatus('Long break started');
+                } else {
+                    currentMode = BREAK_MODE;
+                    const breakTime = parseInt(breakTimeInput.value) * 60;
+                    setTimeLeft(breakTime);
+                    setTotalTime(breakTime);
+                    updateStatus('Break started');
+                }
+                
+                setTimerColor(BREAK_MODE);
+            } else {
+                currentMode = WORK_MODE;
+                const workTime = parseInt(workTimeInput.value) * 60;
+                setTimeLeft(workTime);
+                setTotalTime(workTime);
+                updateStatus('Work started');
+                setTimerColor(WORK_MODE);
+            }
+            
+            updateTimerDisplay();
+            updateProgressBar(0); // Reset progress bar
+            
+            // Auto-start the next timer
+            startTimer();
+        }
+        
+        // Get status text based on current mode
+        function getStatusText() {
+            if (currentMode === WORK_MODE) {
+                return 'Work in progress';
+            } else if (currentMode === BREAK_MODE) {
+                return 'Break time';
+            } else {
+                return 'Long break time';
+            }
+        }
+        
+        // Toggle settings inputs
+        function toggleSettingsInputs(disabled) {
+            workTimeInput.disabled = disabled;
+            breakTimeInput.disabled = disabled;
+            longBreakTimeInput.disabled = disabled;
+        }
+        
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            startTimer();
+            updateStatus(getStatusText());
+        });
+        
+        pauseBtn.addEventListener('click', pauseTimer);
+        resumeBtn.addEventListener('click', resumeTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        skipBtn.addEventListener('click', skipTimer);
+        
+        // Initialize the app
+        initialize();
+    </script>
+</body>
+</html>
