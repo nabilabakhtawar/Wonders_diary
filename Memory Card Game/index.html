@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Memory Card Game</title>
+  <title>Memory Challenge Pro</title>
   <style>
     :root {
-      --primary-color: #4a6eb5;
-      --secondary-color: #2c3e50;
-      --accent-color: #f1c40f;
+      /* Modern professional color palette */
+      --primary-color: #4361ee;
+      --secondary-color: #3a0ca3;
+      --accent-color: #f72585;
+      --light-accent: #4cc9f0;
       --card-bg: #ffffff;
-      --matched-card: #2ecc71;
-      --text-color: #333333;
+      --matched-card: #4ade80;
+      --text-color: #2b2d42;
+      --light-text: #ffffff;
+      --background: #f8f9fa;
+      --card-shadow: rgba(149, 157, 165, 0.2);
+      --hover-shadow: rgba(0, 0, 0, 0.15);
     }
 
     * {
@@ -21,97 +27,170 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 2rem;
+      padding: 1.5rem;
       color: var(--text-color);
     }
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
+      background-color: var(--background);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
     header {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: var(--light-text);
+      padding: 2rem;
       text-align: center;
-      margin-bottom: 2rem;
-      color: white;
+      position: relative;
     }
 
     h1 {
       font-size: 2.5rem;
+      font-weight: 700;
       margin-bottom: 0.5rem;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      letter-spacing: -0.05em;
     }
 
-    .game-info {
+    header p {
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+
+    .dashboard {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 1.5rem;
-      background-color: rgba(255, 255, 255, 0.1);
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+      padding: 1.5rem 2rem;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      gap: 1rem;
+    }
+
+    .difficulty-select {
+      display: flex;
+      align-items: center;
+    }
+
+    .difficulty-select label {
+      font-weight: 600;
+      margin-right: 0.75rem;
+    }
+
+    .difficulty-select select {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      border: 2px solid var(--primary-color);
+      background-color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .difficulty-select select:focus {
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.3);
     }
 
     .stats {
       display: flex;
       gap: 2rem;
+      flex-wrap: wrap;
     }
 
     .stat {
       display: flex;
-      flex-direction: column;
       align-items: center;
+      gap: 0.5rem;
+    }
+
+    .stat-icon {
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      font-size: 1rem;
+    }
+
+    .stat-details {
+      display: flex;
+      flex-direction: column;
     }
 
     .stat-value {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: white;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-color);
     }
 
     .stat-label {
-      font-size: 0.9rem;
-      opacity: 0.8;
-      color: white;
+      font-size: 0.8rem;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
     }
 
     button {
       background-color: var(--accent-color);
+      color: white;
       border: none;
       padding: 0.75rem 1.5rem;
-      border-radius: 5px;
-      font-weight: bold;
+      border-radius: 0.5rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    .game-area {
+      padding: 2rem;
     }
 
     .game-board {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      grid-gap: 1rem;
+      grid-gap: 1.25rem;
       perspective: 1000px;
     }
 
     .card {
-      height: 130px;
+      height: 140px;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       cursor: pointer;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      border-radius: 1rem;
+      box-shadow: 0 5px 15px var(--card-shadow);
     }
 
     .card.flipped {
@@ -119,9 +198,13 @@
     }
 
     .card.matched {
-      transform: rotateY(180deg) scale(1.05);
+      animation: pulse 1.5s infinite alternate;
       box-shadow: 0 0 20px var(--matched-card);
-      transition: all 0.6s ease;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: 0 0 10px var(--matched-card); }
+      to { box-shadow: 0 0 20px var(--matched-card), 0 0 0 2px var(--matched-card); }
     }
 
     .card-face {
@@ -129,31 +212,32 @@
       width: 100%;
       height: 100%;
       backface-visibility: hidden;
-      border-radius: 10px;
+      border-radius: 1rem;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 2.5rem;
       user-select: none;
+      transition: all 0.2s ease;
     }
 
     .card-back {
-      background: linear-gradient(45deg, #3498db, #9b59b6);
-      color: white;
+      background: linear-gradient(135deg, var(--primary-color), var(--light-accent));
       font-weight: bold;
-      z-index: 1;
     }
 
     .card-back::after {
       content: "?";
-      font-size: 3rem;
-      opacity: 0.7;
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      opacity: 0.8;
     }
 
     .card-front {
       background-color: var(--card-bg);
       transform: rotateY(180deg);
-      box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.05);
+      font-size: 3rem;
     }
 
     .victory-overlay {
@@ -164,7 +248,6 @@
       height: 100%;
       background-color: rgba(0, 0, 0, 0.8);
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       z-index: 10;
@@ -180,41 +263,132 @@
 
     .victory-content {
       background-color: white;
-      padding: 2rem;
-      border-radius: 10px;
+      padding: 3rem;
+      border-radius: 1.5rem;
       text-align: center;
+      width: 90%;
+      max-width: 500px;
       animation: bounce 0.5s ease;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .victory-content h2 {
-      color: var(--primary-color);
-      font-size: 2rem;
+      color: var(--accent-color);
+      font-size: 2.5rem;
       margin-bottom: 1rem;
     }
 
     .victory-content p {
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
       font-size: 1.2rem;
+      color: #555;
+    }
+
+    .victory-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .victory-stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .victory-stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .victory-stat-label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #777;
+      letter-spacing: 0.05em;
+    }
+
+    .trophy-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: #f1c40f;
+    }
+
+    .play-again-btn {
+      background-color: var(--primary-color);
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .confetti {
       position: absolute;
       width: 10px;
       height: 10px;
-      background-color: #f1c40f;
       opacity: 0;
     }
 
-    .difficulty-select {
-      margin-bottom: 1rem;
+    /* Media Queries */
+    @media (max-width: 900px) {
+      .dashboard {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      
+      .controls {
+        justify-content: center;
+        width: 100%;
+      }
+      
+      .stats {
+        justify-content: center;
+      }
     }
 
-    .difficulty-select select {
-      padding: 0.5rem;
-      border-radius: 5px;
-      margin-left: 0.5rem;
-      border: 2px solid var(--accent-color);
+    @media (max-width: 768px) {
+      .game-board {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      
+      .card {
+        height: 120px;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .game-board {
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+      }
+      
+      .game-area {
+        padding: 1rem;
+      }
+      
+      .card {
+        height: 100px;
+      }
+      
+      .dashboard {
+        padding: 1rem;
+      }
+      
+      .stats {
+        gap: 1rem;
+      }
+      
+      .victory-content {
+        padding: 2rem 1.5rem;
+      }
     }
 
     @keyframes bounce {
@@ -223,85 +397,81 @@
     }
 
     @keyframes confettiFall {
-      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(1000px) rotate(720deg); opacity: 0; }
-    }
-
-    @media (max-width: 768px) {
-      .game-board {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .card {
-        height: 100px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .game-board {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .game-info {
-        flex-direction: column;
-        gap: 1rem;
-      }
-      .stats {
-        justify-content: center;
-      }
+      0% { transform: translateY(-50vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Memory Card Game</h1>
-      <p>Match all the pairs to win!</p>
+      <h1>Memory Challenge Pro</h1>
+      <p>Test your memory skills with this matching challenge</p>
     </header>
 
-    <div class="difficulty-select">
-      <label for="difficulty">Difficulty:</label>
-      <select id="difficulty">
-        <option value="easy">Easy (8 cards)</option>
-        <option value="medium" selected>Medium (16 cards)</option>
-        <option value="hard">Hard (24 cards)</option>
-      </select>
-    </div>
+    <div class="dashboard">
+      <div class="difficulty-select">
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty">
+          <option value="easy">Easy (8 cards)</option>
+          <option value="medium" selected>Medium (16 cards)</option>
+          <option value="hard">Hard (24 cards)</option>
+          <option value="expert">Expert (36 cards)</option>
+        </select>
+      </div>
 
-    <div class="game-info">
       <div class="stats">
         <div class="stat">
-          <span class="stat-value" id="moves">0</span>
-          <span class="stat-label">Moves</span>
+          <div class="stat-icon">🔄</div>
+          <div class="stat-details">
+            <span class="stat-value" id="moves">0</span>
+            <span class="stat-label">Moves</span>
+          </div>
         </div>
         <div class="stat">
-          <span class="stat-value" id="matches">0</span>
-          <span class="stat-label">Matches</span>
+          <div class="stat-icon">🎯</div>
+          <div class="stat-details">
+            <span class="stat-value" id="matches">0</span>
+            <span class="stat-label">Matches</span>
+          </div>
         </div>
         <div class="stat">
-          <span class="stat-value" id="timer">00:00</span>
-          <span class="stat-label">Time</span>
+          <div class="stat-icon">⏱️</div>
+          <div class="stat-details">
+            <span class="stat-value" id="timer">00:00</span>
+            <span class="stat-label">Time</span>
+          </div>
         </div>
       </div>
-      <button id="reset-btn">Reset Game</button>
+
+      <div class="controls">
+        <button id="reset-btn">
+          <span>New Game</span>
+        </button>
+      </div>
     </div>
 
-    <div class="game-board" id="game-board"></div>
+    <div class="game-area">
+      <div class="game-board" id="game-board"></div>
+    </div>
   </div>
 
   <div class="victory-overlay" id="victory-overlay">
     <div class="victory-content">
+      <div class="trophy-icon">🏆</div>
       <h2>Congratulations!</h2>
-      <p>You've matched all the pairs!</p>
-      <div class="stats">
-        <div class="stat">
-          <span class="stat-value" id="final-moves">0</span>
-          <span class="stat-label">Moves</span>
+      <p>You've completed the memory challenge!</p>
+      <div class="victory-stats">
+        <div class="victory-stat">
+          <span class="victory-stat-value" id="final-moves">0</span>
+          <span class="victory-stat-label">Moves</span>
         </div>
-        <div class="stat">
-          <span class="stat-value" id="final-time">00:00</span>
-          <span class="stat-label">Time</span>
+        <div class="victory-stat">
+          <span class="victory-stat-value" id="final-time">00:00</span>
+          <span class="victory-stat-label">Time</span>
         </div>
       </div>
-      <button id="play-again-btn">Play Again</button>
+      <button id="play-again-btn" class="play-again-btn">Play Again</button>
     </div>
   </div>
 
@@ -332,8 +502,12 @@
       let seconds = 0;
       let totalPairs = 8; // Default for medium difficulty
       
-      // Card symbols (emoji)
-      const emojis = ['🚀', '🎮', '🎵', '🎨', '🚲', '🏆', '🍕', '🌮', '🍦', '🍩', '🎁', '🎭'];
+      // Card symbols (emoji with professional theme)
+      const emojis = [
+        '🚀', '💻', '📱', '⚙️', '📊', '📈', '🔍', '📝', 
+        '🔐', '📡', '🌐', '💼', '📅', '🔔', '📌', '🔑',
+        '📁', '🎯', '💡', '🛠️', '📬', '🧩', '🔄', '📲'
+      ];
       
       // Initialize game
       function initGame() {
@@ -396,6 +570,10 @@
             totalPairs = 12;
             gameBoard.style.gridTemplateColumns = 'repeat(6, 1fr)';
             break;
+          case 'expert':
+            totalPairs = 18;
+            gameBoard.style.gridTemplateColumns = 'repeat(6, 1fr)';
+            break;
         }
         
         // Create shuffled array of card contents
@@ -404,8 +582,12 @@
           cardContents.push(emojis[i], emojis[i]);
         }
         
-        // Shuffle cards
-        const shuffledContents = [...cardContents].sort(() => Math.random() - 0.5);
+        // Fisher-Yates shuffle algorithm
+        const shuffledContents = [...cardContents];
+        for (let i = shuffledContents.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffledContents[i], shuffledContents[j]] = [shuffledContents[j], shuffledContents[i]];
+        }
         
         // Create card elements
         shuffledContents.forEach((content, index) => {
@@ -526,7 +708,7 @@
       
       // Create confetti effect
       function createConfetti() {
-        const colors = ['#f1c40f', '#3498db', '#2ecc71', '#e74c3c', '#9b59b6'];
+        const colors = ['#f72585', '#4361ee', '#4cc9f0', '#4ade80', '#fb8500', '#ffbe0b'];
         
         for (let i = 0; i < 150; i++) {
           const confetti = document.createElement('div');
@@ -536,6 +718,7 @@
           confetti.style.width = Math.random() * 10 + 5 + 'px';
           confetti.style.height = Math.random() * 10 + 5 + 'px';
           confetti.style.opacity = Math.random() + 0.5;
+          confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
           confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
           confetti.style.animationDelay = Math.random() * 3 + 's';
           
@@ -548,6 +731,25 @@
         }
       }
       
+      // Add card hover effects
+      function addCardHoverEffects() {
+        cards.forEach(card => {
+          card.addEventListener('mouseenter', () => {
+            if (!card.classList.contains('flipped') && !card.classList.contains('matched')) {
+              card.style.transform = 'translateY(-5px)';
+              card.style.boxShadow = '0 8px 16px var(--hover-shadow)';
+            }
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            if (!card.classList.contains('flipped') && !card.classList.contains('matched')) {
+              card.style.transform = '';
+              card.style.boxShadow = '';
+            }
+          });
+        });
+      }
+      
       // Event listeners
       resetBtn.addEventListener('click', initGame);
       playAgainBtn.addEventListener('click', () => {
@@ -558,6 +760,9 @@
       
       // Initialize game
       initGame();
+      
+      // Add hover effects after cards are created
+      setTimeout(addCardHoverEffects, 100);
     });
   </script>
 </body>
